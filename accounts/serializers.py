@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
-from .models import User, Candidate, Recruiter
+from .models import User, Candidate, Recruiter,Resume
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -50,3 +50,5 @@ class ResetSerializer(serializers.Serializer):
             )
         return data
 
+class ResumeUploadSerializer(serializers.Serializer):
+    file = serializers.FileField()

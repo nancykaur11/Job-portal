@@ -3,7 +3,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegisterSerializer, LoginSerializer,ResetSerializer
+from .models import Resume
+
+from .serializers import RegisterSerializer, LoginSerializer,ResetSerializer,ResumeUploadSerializer
 
 
 class RegisterView(APIView):
@@ -56,7 +58,25 @@ class ResetView(APIView):
             {"message": "Password changed successfully"},
             status=status.HTTP_200_OK
         )
+class ResumeUploadView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request):
+        serializer = ResumeUploadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        candidate = request.user.candidate
+        pdf_file = serializer.validated_data["file"]
+
+        resume = Resume.objects.create(
+            user=candidate,
+            file=pdf_file
+        )
+
+        return Response(
+            {"message": "Resume uploaded successfully"},
+            status=status.HTTP_200_OK
+        )
 
 
 
