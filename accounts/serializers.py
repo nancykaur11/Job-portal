@@ -37,3 +37,16 @@ class LoginSerializer(serializers.Serializer):
         if not user:
             raise AuthenticationFailed("Invalid email or password")
         return user
+
+class ResetSerializer(serializers.Serializer):
+    old_password=serializers.CharField(write_only=True)
+    new_password=serializers.CharField(write_only=True,min_length=8)
+    confirm_password=serializers.CharField(write_only=True)
+
+    def validate(self,data):
+        if data["new_password"] != data["confirm_password"]:
+            raise serializers.ValidationError(
+                {"password and confirm pasword is not same"}
+            )
+        return data
+
