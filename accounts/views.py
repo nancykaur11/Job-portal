@@ -3,6 +3,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+from .utils.bunny import upload_pdf_to_bunny
+from .utils.pdf import extract_text_from_pdf
+from .utils.gemini import parse_resume_text
+
 from .models import Resume
 
 from .serializers import RegisterSerializer, LoginSerializer,ResetSerializer,ResumeUploadSerializer
@@ -58,26 +62,78 @@ class ResetView(APIView):
             {"message": "Password changed successfully"},
             status=status.HTTP_200_OK
         )
+
+# class ResumeUploadView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+#         serializer = ResumeUploadSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+
+#         candidate = request.user.candidate
+#         pdf_file = serializer.validated_data["file"]
+
+#         # 1️⃣ Upload to Bunny CDN
+#         cdn_url = upload_pdf_to_bunny(pdf_file)
+
+#         # Reset pointer
+#         pdf_file.seek(0)
+
+#         # 2️⃣ Send FULL PDF to Gemini
+#         parsed_resume = parse_resume_pdf_with_gemini(pdf_file)
+
+#         # 3️⃣ Save
+#         resume = Resume.objects.create(
+#             user=candidate,
+#             cdn_url=cdn_url,
+#             parsed_data=parsed_resume
+#         )
+
+#         return Response(
+#             {
+#                 "message": "Resume uploaded, stored & parsed successfully",
+#                 "cdn_url": cdn_url,
+#                 "parsed_resume": parsed_resume
+#             },
+#             status=status.HTTP_201_CREATED
+#         )
 class ResumeUploadView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        serializer = ResumeUploadSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+            serializer = ResumeUploadSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        candidate = request.user.candidate
-        pdf_file = serializer.validated_data["file"]
+            candidate = request.user.candidate
+            pdf_file = serializer.validated_data["file"]
+            print("Received PDF file:", pdf_file.name,candidate)
 
-        resume = Resume.objects.create(
-            user=candidate,
-            file=pdf_file
-        )
+            # 1️⃣ Upload to Bunny
+            cdn_url = upload_pdf_to_bunny(pdf_file)
+            print("CDN URL:", cdn_url)
 
-        return Response(
-            {"message": "Resume uploaded successfully"},
-            status=status.HTTP_200_OK
-        )
+            # 2️⃣ Extract text
+            pdf_text = extract_text_from_pdf(pdf_file)
+            print("Extracted Text:", pdf_text)  # Print first 500 characters
 
+            # 3️⃣ Parse with Gemini
+            # parsed_resume = parse_resume_text(pdf_text)
+            # print("Parsed Resume:", parsed_resume)
+
+            resume = Resume.objects.create(
+                user=candidate,
+                cdn_url=cdn_url,
+                parsed_data={}
+            )
+
+            return Response(
+                {
+                    "message": "Resume uploaded & parsed successfully",
+                    "cdn_url": cdn_url,
+                    "parsed_resume": {}
+                },
+                status=status.HTTP_201_CREATED
+            )
 
 
 # from rest_framework.views import APIView

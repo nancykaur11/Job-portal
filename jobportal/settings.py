@@ -14,6 +14,8 @@ from pathlib import Path
 from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+import os
+from dotenv import load_dotenv
 
 
 # Quick-start development settings - unsuitable for production
@@ -133,3 +135,12 @@ USE_TZ = True
 STATIC_URL = 'static/'
 AUTH_USER_MODEL = "accounts.User"
 
+
+
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+BUNNY_STORAGE_ZONE = os.getenv("BUNNY_STORAGE_ZONE")
+BUNNY_STORAGE_PASSWORD = os.getenv("BUNNY_STORAGE_PASSWORD")
+BUNNY_STORAGE_HOST = os.getenv("BUNNY_STORAGE_HOST")
+BUNNY_PULL_ZONE_URL = os.getenv("BUNNY_PULL_ZONE_URL")
