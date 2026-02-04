@@ -117,20 +117,19 @@ class ResumeUploadView(APIView):
             print("Extracted Text:", pdf_text)  # Print first 500 characters
 
             # 3️⃣ Parse with Gemini
-            # parsed_resume = parse_resume_text(pdf_text)
-            # print("Parsed Resume:", parsed_resume)
+            parsed_resume = parse_resume_text(pdf_text)
+            print("Parsed Resume:", parsed_resume)
 
             resume = Resume.objects.create(
                 user=candidate,
                 cdn_url=cdn_url,
-                parsed_data={}
             )
 
             return Response(
                 {
                     "message": "Resume uploaded & parsed successfully",
                     "cdn_url": cdn_url,
-                    "parsed_resume": {}
+                    "parsed_resume": parsed_resume
                 },
                 status=status.HTTP_201_CREATED
             )

@@ -93,7 +93,6 @@ class Experience(models.Model):
 class Resume(models.Model):
     user = models.ForeignKey("accounts.Candidate", on_delete=models.CASCADE)
     cdn_url = models.URLField(null=True, blank=True)
-    parsed_data = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(null=True, blank=True)
 
 

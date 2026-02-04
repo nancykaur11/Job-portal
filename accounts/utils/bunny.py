@@ -1,7 +1,6 @@
 import uuid
 import requests
 
-# 🔴 Hard-coded Bunny credentials (NOT recommended for production)
 BUNNY_STORAGE_ZONE = "resumes-jobportal"
 BUNNY_STORAGE_PASSWORD = "41d59899-fe28-48cd-afd4e603db33-7195-4204"
 BUNNY_PULL_ZONE_URL = "https://resume-jobportal.b-cdn.net"
